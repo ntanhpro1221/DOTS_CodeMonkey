@@ -3,52 +3,58 @@ using Unity.Entities;
 using Unity.Transforms;
 using Unity.Mathematics;
 using Unity.Physics;
-using UnityEngine;
 
 partial struct ActorMoveSystem : ISystem {
+    private Job job;
+
     [BurstCompile]
     public void OnUpdate(ref SystemState state) {
-        foreach (var (
-            localTrans,
-            moveData,
-            velocity) in SystemAPI.Query<
-                RefRW<LocalTransform>,
-                RefRO<ActorMoveData.Data>,
-                RefRW<PhysicsVelocity>>()) {
+        job.Init(
+            deltaTime: SystemAPI.Time.DeltaTime);
+        job.ScheduleParallel();
+    }
 
+    [BurstCompile]
+    public partial struct Job : IJobEntity {
+        private float deltaTime;
+
+        public void Init(float deltaTime) {
+            this.deltaTime = deltaTime;
+        }
+
+        public void Execute(in ActorMoveData.Data moveData, ref LocalTransform localTrans, ref PhysicsVelocity velocity) {
             // reset value
-            velocity.ValueRW.Linear = float3.zero;
-            velocity.ValueRW.Angular = float3.zero;
+            velocity.Linear = float3.zero;
+            velocity.Angular = float3.zero;
 
             // calc move stuff
-            float3 moveDir =
-                moveData.ValueRO.targetPos -
-                localTrans.ValueRO.Position;
+            float3 moveDir = moveData.targetPos - localTrans.Position;
             float moveDis = math.length(moveDir);
-            if (moveDis < math.EPSILON) continue;
+            if (moveDis < math.EPSILON) return;
             moveDir = math.normalize(moveDir);
 
             // do move
-            if (moveDis <= SystemAPI.Time.DeltaTime * moveData.ValueRO.moveSpeed)
-                localTrans.ValueRW.Position = moveData.ValueRO.targetPos;
-            else velocity.ValueRW.Linear = moveDir * moveData.ValueRO.moveSpeed;
+            if (moveDis <= deltaTime * moveData.moveSpeed)
+                localTrans.Position = moveData.targetPos;
+            else velocity.Linear = moveDir * moveData.moveSpeed;
 
             // rotate stuff
-            if (math.length(velocity.ValueRO.Linear) < math.EPSILON) continue;
+            if (math.length(velocity.Linear) < math.EPSILON) return;
 
-            quaternion curQuat = localTrans.ValueRO.Rotation;
+            quaternion curQuat = localTrans.Rotation;
             quaternion targetQuat = quaternion.LookRotation(moveDir, math.up());
             float rotateDis = math.angle(curQuat, targetQuat);
-            if (float.IsNaN(rotateDis) || rotateDis < math.EPSILON) continue;
+            if (float.IsNaN(rotateDis) || rotateDis < math.EPSILON) return;
 
             float3 rotateDir = -math.normalize(math.Euler(math.mul(
                 math.inverse(curQuat),
                 targetQuat)));
 
             // do rotate
-            if (rotateDis <= SystemAPI.Time.DeltaTime * moveData.ValueRO.rotateSpeed)
-                localTrans.ValueRW.Rotation = targetQuat;
-            else velocity.ValueRW.Angular = rotateDir * moveData.ValueRO.rotateSpeed;
+            if (rotateDis <= deltaTime * moveData.rotateSpeed)
+                localTrans.Rotation = targetQuat;
+            else velocity.Angular = rotateDir * moveData.rotateSpeed;
         }
     }
 }
+
