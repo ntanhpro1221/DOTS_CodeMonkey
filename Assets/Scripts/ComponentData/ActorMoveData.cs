@@ -18,7 +18,7 @@ public class ActorMoveData : MonoBehaviour {
             AddComponent(GetEntity(TransformUsageFlags.Dynamic), new Data() {
                 moveSpeed = authoring.moveSpeed,
                 rotateSpeed = authoring.rotateSpeed,
-                targetPos = authoring.targetPos,
+                targetPos = authoring.targetPos = authoring.transform.position,
             });
         }
     }

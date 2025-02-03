@@ -15,6 +15,7 @@ public class SoldierMoveHandler : MonoBehaviour {
     private void MoveAllSoldierTo(Vector3 targetPos) {
         var entityQuery = new EntityQueryBuilder(Allocator.Temp)
             .WithAll<ActorMoveData.Data>()
+            .WithAll<SelectedTag.Tag>()
             .Build(World.DefaultGameObjectInjectionWorld.EntityManager);
         var entityArray = entityQuery.ToComponentDataArray<ActorMoveData.Data>(Allocator.Temp);
 

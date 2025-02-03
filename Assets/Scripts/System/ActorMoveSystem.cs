@@ -57,4 +57,3 @@ partial struct ActorMoveSystem : ISystem {
         }
     }
 }
-
