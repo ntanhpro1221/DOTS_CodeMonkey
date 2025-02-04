@@ -99,7 +99,7 @@ GameObject:
   - component: {fileID: 1938114200273774518}
   - component: {fileID: 1974692759208237176}
   - component: {fileID: 5842676207927473956}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Actor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
