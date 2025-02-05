@@ -192,6 +192,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52ae4c0ea2d5eb748bf983ceb32e3cc7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ringRadius: 2.2
+  disInRing: 2
 --- !u!4 &251238411
 Transform:
   m_ObjectHideFlags: 0
@@ -749,6 +751,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9ac023ff7af5bf4ebbc7d1496268416, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  canvasTrans: {fileID: 330585546}
   selectRectImg: {fileID: 1221367417}
   selectRectTrans: {fileID: 1221367415}
 --- !u!114 &1221367417
